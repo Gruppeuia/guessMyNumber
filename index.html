@@ -17,17 +17,48 @@
             <button id="guessButton" onclick="onGuessNumber()">Guess</button>
         </section>
         
+        <script>
+        
+            const resources = {
+                lang:{
+                    guess_my_number_title:"Guess my number its between ${0} and ${1}"
+                }
+                
+
+            }
+        
+        </script>
         
         <script>
+            
+            /*
+            // KIDS DONT DO THIS AT HOME !!!
+            let source = "Guess my number its between ${0} and ${1}"
+            
+            let test = "{0}";
+            let counter = 0;
+            while(true){
+                if(source.includes(test)){
+                    source = source.replace(test,"Jupp");
+                    counter++
+                    test = "{"+counter+"}";
+                } else{
+                    break;
+                }
+            }
+            */
+            
             
             const DEBUG = true;
             const MAX_NUMBER = 100;
             const MIN_NUMBER = 1;
             
+        
+            
             let correctNumber = MIN_NUMBER + Math.round(Math.random() * (MAX_NUMBER - MIN_NUMBER));
             
             print(`The correct number is ${correctNumber}`);
-            setText("instructionTitle",`Guess my number its between ${MIN_NUMBER} and ${MAX_NUMBER}`);
+            setText("instructionTitle",replace(resources.lang.guess_my_number_title,MIN_NUMBER,MAX_NUMBER));
             
             function onGuessNumber(){
                 
@@ -35,9 +66,34 @@
                 
             }
             
+            // UTIL functions -------------------------------------
+            
             function setText(target, text){
                  document.getElementById(target).innerHTML = text;
             }
+            
+            function replace(source, ...params) {
+              const regex = /\$\{\d+\}/g;
+              let matches = null;
+              let index = 0;
+
+              while ((matches = regex.exec(source)) !== null) {
+                if (matches.index === regex.lastIndex) {
+                  regex.lastIndex++;
+                }
+
+                matches.forEach((match, groupIndex) => {
+                  print(match);
+                    source = source.replace(match, params[index]);
+                    
+                  index++;
+                });
+              }
+
+              return source;
+            }
+            
+            // DEBUG functions ----------------------------------
             
             function print(...lines){
                 if(DEBUG){
