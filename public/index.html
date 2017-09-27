@@ -108,6 +108,15 @@
                 let scoreBoard = document.getElementById("higScoreList");
                 scoreBoard.innerHTML = "";
                 
+                fetch("/highScore").then(resp =>{
+                    
+                    return resp.json();
+                    
+                }).then( 
+                json => {
+                    
+                })
+                
                 highScores.forEach(item =>{
                     let listItem = document.createElement("li");
                     listItem.innerHTML = item;
