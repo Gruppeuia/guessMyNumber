@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Guess my number!</title>
+        <meta charset="utf-8">
+    </head>
+    <body onload="init()">
+        
+        <section>
+            <h1 id="instructionTitle">Title</h1>
+            <h4 id="instructionSubtitle">Description</h4>
+            <ul id="higScoreList">
+            </ul>
+            <button id="startButton" onClick="startGame()">New Game</button>
+        </section>
+        
+        <section id="highscoreform" hidden>
+            <label for="userNick">Nick</label>
+            <input id="userNick" type="text" placeholder="Your nick name">
+            <button onclick="saveScore()">Save</button>
+        </section>
+        
+        <section id="gameUI" hidden>
+            <label for="guess">Guess:</label>
+            <input type="number" id="guessedNumber">
+            <button id="guessButton" onclick="onGuessNumber()">Guess</button>
+        </section>
+        
+        <script>
+        
+            const resources = {
+                lang:{
+                    game_title:"Guess my Number!",
+                    game_subTitle:"A stupid litle game",
+                    guess_my_number_title:"Guess my number its between ${0} and ${1}",
+                    correct_guess:"Your guess was correct. WOHO!!",
+                    wrong_guess:"Nope thats wrong, my number is ${0}",
+                    is_higher:"higher",
+                    is_lower:"lower",
+                    number_of_atempts:"Number of atempts ${0}"
+                }
+                
+            }
+            
+            /*const resources = {
+                lang:{
+                    guess_my_number_title:"Gjett mitt tall, det er mellom ${0} og ${1}"
+                }
+                
+            }*/
+        
+        </script>
+        
+        <script>
+            
+            /*
+            // KIDS DONT DO THIS AT HOME !!!
+            let source = "Guess my number its between ${0} and ${1}"
+            
+            let test = "{0}";
+            let counter = 0;
+            while(true){
+                if(source.includes(test)){
+                    source = source.replace(test,"Jupp");
+                    counter++
+                    test = "{"+counter+"}";
+                } else{
+                    break;
+                }
+            }
+            */
+            
+            
+            const DEBUG = true;         // Should we display debug statments.
+            const MAX_NUMBER = 100;     // Upper bound for the correct number
+            const MIN_NUMBER = 1;       // Lower bound for the correct number
+            
+            let correctNumber = 0;
+            let atempts = 0;
+            
+            let highScores = [];
+   
+            
+            function init(){
+                
+                setText("instructionTitle",resources.lang.game_title);
+                setText("instructionSubtitle",resources.lang.game_subTitle);
+                showHighScoreBoard();
+                show("startButton");
+                
+            }
+       
+            
+            function startGame(){
+                correctNumber = getRandomNumber();
+                atempts = 0;
+                hide("startButton");
+                show("gameUI");
+                 setText("instructionTitle",replace(resources.lang.guess_my_number_title,MIN_NUMBER,MAX_NUMBER));
+                setText("instructionSubtitle","");
+                
+                print("Started new game",`The correct number is ${correctNumber}`);
+                
+            }
+            
+            function showHighScoreBoard(){
+                show("higScoreList");
+                let scoreBoard = document.getElementById("higScoreList");
+                scoreBoard.innerHTML = "";
+                
+                highScores.forEach(item =>{
+                    let listItem = document.createElement("li");
+                    listItem.innerHTML = item;
+                    scoreBoard.appendChild(listItem);
+                })
+                
+            }
+            
+            function saveScore(){
+                
+                let nick = getValue("userNick");
+                highScores.push(`${nick} ${atempts}`);
+                
+                hide("highscoreform");
+                init();
+            }
+            
+            function onGuessNumber(){
+                
+                // We multiply by one to make it a number
+                let guessedNumber = getValue("guessedNumber") * 1;
+                atempts++;
+                
+                print(`Guessed number ${guessedNumber}`);
+                
+                if(guessedNumber === correctNumber){
+                    onCorrectAnswer(guessedNumber)
+                } else{
+                   onWrongAnswer(guessedNumber);
+                }  
+            }
+            
+            function onCorrectAnswer(guessedNumber){
+                print("Correct guess");
+                let tilteText = resources.lang.correct_guess;
+                setText("instructionTitle",tilteText);
+                hide("gameUI");
+                show("highscoreform");
+            }
+            
+            function onWrongAnswer(guessedNumber){
+                 print("Wrong guess")  ; 
+                let diffText = (correctNumber - guessedNumber) > 0 ? resources.lang.is_higher:resources.lang.is_lower; 
+                let tilteText = replace(resources.lang.wrong_guess, diffText);
+                setText("instructionTitle",tilteText);
+                setText("instructionSubtitle",replace(resources.lang.number_of_atempts,atempts));
+            }
+            
+            // UTIL functions -------------------------------------
+            
+            function getValue(target){
+                 let element = document.getElementById(target);
+                let ret = null;
+                if(element){
+                    ret = element.value
+                } else{
+                    printError(`The target element ${target} was not found`);
+                    throw(new Error(`The target element ${target} was not found`));
+                }
+                
+                return ret;
+            }
+            
+            function show(target){
+                 let element = document.getElementById(target);
+                if(element){
+                    element.removeAttribute("hidden");
+                } else{
+                    printError(`The target element ${target} was not found`);
+                }
+            }
+            
+            function hide(target){
+                 let element = document.getElementById(target);
+                if(element){
+                    element.setAttribute("hidden","");
+                } else{
+                    printError(`The target element ${target} was not found`);
+                }
+            }
+            
+            function setText(target, text){
+                let element = document.getElementById(target);
+                if(element){
+                    element.innerHTML = text;
+                } else{
+                    printError(`The target element ${target} was not found`);
+                }
+                 
+            }
+            
+            function replace(source, ...params) {
+              const regex = /\$\{\d+\}/g;
+              let matches = null;
+              let index = 0;
+
+              while ((matches = regex.exec(source)) !== null) {
+                if (matches.index === regex.lastIndex) {
+                  regex.lastIndex++;
+                }
+
+                matches.forEach((match, groupIndex) => {
+                    source = source.replace(match, params[index]);
+                  index++;
+                });
+              }
+
+              return source;
+            }
+            
+            function getRandomNumber(){
+                return MIN_NUMBER + Math.round(Math.random() * (MAX_NUMBER - MIN_NUMBER));
+            }
+            
+            // DEBUG functions ----------------------------------
+            
+            function print(...lines){
+                if(DEBUG){
+                    lines.forEach(item => {
+                        console.log(item);
+                    })
+                }
+            }
+            
+             function printError(...lines){
+                if(DEBUG){
+                    lines.forEach(item => {
+                        console.error(item);
+                    })
+                }
+            }
+            
+        </script>
+    </body>
+</html>
