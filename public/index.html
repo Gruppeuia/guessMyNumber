@@ -99,10 +99,22 @@
             function saveScore(){
                 
                 let nick = getValue("userNick");
-                highScores.push(`${nick} ${atempts}`);
-                
-                hide("highscoreform");
-                init();
+                let score = JSON.stringify( {name:nick,score:atempts,timestamp:Date.now()});
+                let request = new Request('/score', {
+                    method: 'POST', 
+                    body:score,
+                    headers:{
+                        "content-type":"application/json"
+                    }
+                });
+
+                fetch(request).then(resp =>{
+                    hide("highscoreform");
+                    init();
+                }).catch(err =>{
+                    hide("highscoreform");
+                    init();
+                });
             }
             
             function onGuessNumber(){
