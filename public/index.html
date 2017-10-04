@@ -52,10 +52,7 @@
             
             let correctNumber = 0;
             let atempts = 0;
-            
-            let highScores = [];
-   
-            
+                        
             function init(){
                 
                 setText("instructionTitle",resources.lang.game_title);
@@ -83,19 +80,18 @@
                 let scoreBoard = document.getElementById("higScoreList");
                 scoreBoard.innerHTML = "";
                 
-                fetch("/highScore").then(resp =>{
-                    
+                fetch("/highscores").then(resp =>{
                     return resp.json();
-                    
                 }).then( 
                 json => {
-                    
-                })
-                
-                highScores.forEach(item =>{
-                    let listItem = document.createElement("li");
-                    listItem.innerHTML = item;
-                    scoreBoard.appendChild(listItem);
+                    json.forEach(item =>{
+                        let listItem = document.createElement("li");
+                        listItem.innerHTML = `${item.name} ${item.score}`;
+                        scoreBoard.appendChild(listItem);
+                    });
+                }).catch(err => {
+                    //TODO: Add better error handling?
+                    printError(err);
                 })
                 
             }

@@ -3,9 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
-var highscoreList = ["CHRISTIAN 1"];
+var highscoreList = [{name:"Christian", score:900, timestamp:"123456"}];
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 8080));
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
@@ -14,9 +14,22 @@ app.get('/', function(req, res) {
   res.send(staticApp);
 });
 
-app.get('/highScore', function(req,res){
-    res.send(highscoreList);
+app.get('/highscores', function(request,response){
+    //res.send(JSON.stringify(highscoreList));
+    response.send(highscoreList);
 });
+
+app.post("/score", function(req,res){
+    let score = req.body;
+    if(score.name != undefined && score.score != undefined){
+        console.log(`Post score request ${score.name} ${score.score}`);
+        highscoreList.push(score);
+        res.status(200).end();
+    } else{
+        res.status(400).end();
+    }
+})
+
 
 app.use(function(err, req, res, next) {
     console.error(err.stack);
@@ -24,5 +37,5 @@ app.use(function(err, req, res, next) {
 });
 
 app.listen(app.get('port'), function() {
-    console.log('Event server running', app.get('port'));
+    console.log('Guess my number server running', app.get('port'));
 });
