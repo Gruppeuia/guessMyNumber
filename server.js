@@ -48,7 +48,7 @@ app.listen(app.get('port'), function() {
 function getHighScores(){
     
     let client = new Client({
-        connectionString:"postgres://hfekljdibcptzj:7b53232f8d744bc5c18e3f8ca05d2975a95946f96e3ddde0fc6fc725e0792357@ec2-176-34-242-58.eu-west-1.compute.amazonaws.com:5432/d4hur6e4168fvr",
+        connectionString:process.env.DATABASE_URL,
         ssl:true
     });
 
@@ -68,7 +68,7 @@ function getHighScores(){
 function saveHighScores(score){
     
     let client = new Client({
-        connectionString:"postgres://hfekljdibcptzj:7b53232f8d744bc5c18e3f8ca05d2975a95946f96e3ddde0fc6fc725e0792357@ec2-176-34-242-58.eu-west-1.compute.amazonaws.com:5432/d4hur6e4168fvr",
+        connectionString:process.env.DATABASE_URL,
         ssl:true
     });
 
